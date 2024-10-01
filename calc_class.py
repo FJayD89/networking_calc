@@ -30,12 +30,14 @@ class Calc:
 		if expr != '':
 			val = getExprValue(expr, self.stored)
 		print(get_pretty(val))
-		# print("\033[0m", end="")
+
+	# print("\033[0m", end="")
 
 	def show_percent(self):
 		# print("\033[92m", end="")
 		print(f"{self.value * 100:.5}%")
-		# print("\033[0m", end="")
+
+	# print("\033[0m", end="")
 
 	def end(self):
 		self.show_pretty()
@@ -79,7 +81,29 @@ class Calc:
 		if name in self.stored:
 			print(f"rewriting {name} from {self.stored[name]} to {val}.")
 		self.stored[name] = val
-		self.history.append(f"{name} = {self.value}")
+		self.history.append(f"{name} = {val}")
+
+	@staticmethod
+	def show_help(self, topic: str = ""):
+		match topic:
+			case "":
+				pass
+			case _:
+				help_str = \
+					"""
+				Usage:
+					help <topic>
+					opers: explain operators
+					zero(): resets value to zero
+					end(): ends calc
+					back(): goes a step back
+					hist(): shows history of session
+					show(|expr): shows current value, or evaluates expr
+					store(name, |val) stores val (or current value, if empty) 
+						into variable name 
+					help(): 3 guesses, buddy
+					"""
+		print(help_str)
 
 	cmds: dict[str, Callable[["Calc", str], int]] = {
 		'%': show_percent,
@@ -88,7 +112,8 @@ class Calc:
 		'back': revert,
 		'hist': show_hist,
 		'show': show_pretty,
-		'store': store
+		'store': store,
+		'help': show_help
 	}
 
 	def execute(self, line: str) -> int:

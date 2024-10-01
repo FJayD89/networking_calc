@@ -29,22 +29,22 @@ def getExprValue(expr: str, stored: dict[str, float]) -> float:
 	if abs_expr in stored.keys():
 		return stored[abs_expr]
 
-	prepend = '1' if abs_expr[0] == 'e' else ''
-	pr_expr = (prepend + abs_expr).strip()
-	# a = 1.45e5
+	# prepend = '1' if abs_expr[0] == 'e' else ''
+	# pr_expr = (prepend + abs_expr).strip()
+
 	value: float
 	for operator in infix_operators:
-		if operator in pr_expr:
-			oper_split = pr_expr.split(operator)
-			num_str = ''.join(oper_split[:-1])
-			num_val = getExprValue(num_str, stored)
-			denom_str = oper_split[-1]
-			denom_val = getExprValue(denom_str, stored)
-			value = operator_dict[operator](num_val, denom_val)
+		if operator in abs_expr:
+			oper_split = abs_expr.split(operator)
+			first_segment = ''.join(oper_split[:-1])
+			first_val = getExprValue(first_segment, stored)
+			second_segment = oper_split[-1]
+			second_val = getExprValue(second_segment, stored)
+			value = operator_dict[operator](first_val, second_val)
 			break
 
 	else:
-		value = getStrValue(pr_expr)
+		value = float(abs_expr)
 
 	return sign * value
 
