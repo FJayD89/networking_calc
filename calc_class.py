@@ -17,7 +17,9 @@ class Calc:
 	def __init__(self):
 		self.history = [0]
 		self.value = 0.0
-		self.stored = {}
+		self.stored = {
+			"c": 2.99774e8
+		}
 
 		print("Started")
 
@@ -83,11 +85,64 @@ class Calc:
 		self.stored[name] = val
 		self.history.append(f"{name} = {val}")
 
+	def links(self):
+		link_count = int(input("link count\n"))
+
+		packet_no = int(input("no of packets\n"))
+		packet_sizes: list[float] = [0]*packet_no
+
+		for packet_index in range(packet_no):
+			size_expr = input(f"size of packet {packet_index} [b] BITS!!! \n")
+			packet_sizes[packet_index] = getExprValue(size_expr, self.stored)
+
+		link_lengths: list[float] = [0]*link_count
+		link_bw: list[float] = [0]*link_count
+		prop_speeds: list[float] = [0]*link_count
+
+		for link_index in range(link_count):
+			len_expr = input(f"length of link {link_index} [m] \n")
+			link_lengths[link_index] = getExprValue(len_expr, self.stored)
+			bw_expr = input(f"bw of link {link_index} [b/s] \n")
+			link_bw[link_index] = getExprValue(bw_expr, self.stored)
+			prop_expr = input(f"propagation speed of link {link_index} [m/s] \n")
+			prop_speeds[link_index] = getExprValue(prop_expr, self.stored)
+
+		packet_delay = 0
+		# Transmission delay from start-host
+		for i in range(packet_no):
+			trans_delay_i = packet_sizes[i] / link_bw[0]
+			packet_delay += trans_delay_i
+
+		packet_delay += (link_lengths[0] / prop_speeds[0])
+		# Adding first propogation delay.
+
+		# Transmission through routers
+		for i in range(1, link_count):
+			prop_delay = (link_lengths[i] / prop_speeds[i])
+			trans_delay = (packet_sizes[-1] / link_bw[i])
+
+			# queueing_delay = 0
+			prev_packet_trans = 0
+
+			# Calculate queueing delay.
+			if i != link_count-1:
+				for p in range(packet_no-1):
+					prev_packet_trans += packet_sizes[p] / link_bw[i+1]
+
+			queueing_delay = 0 if (trans_delay > prev_packet_trans) else (prev_packet_trans - trans_delay)
+			packet_delay += prop_delay + queueing_delay + trans_delay
+
+		print("total packet delay:")
+		self.show_pretty(str(packet_delay))
+		# return packet_delay
+
+
+
 	@staticmethod
-	def show_help(self, topic: str = ""):
+	def show_help(_, topic: str = ""):
 		match topic:
-			case "":
-				pass
+			# case "":
+			# 	pass
 			case _:
 				help_str = \
 					"""
@@ -113,7 +168,8 @@ class Calc:
 		'hist': show_hist,
 		'show': show_pretty,
 		'store': store,
-		'help': show_help
+		'help': show_help,
+		'links': links
 	}
 
 	def execute(self, line: str) -> int:

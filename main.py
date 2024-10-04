@@ -22,6 +22,9 @@ def input_loop(calc: Calc):
 		except ArgumentError as e:
 			print(e)
 			continue
+		except KeyError as e:
+			print(e)
+			continue
 
 		if ret_value == -1:
 			break

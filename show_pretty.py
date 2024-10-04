@@ -1,6 +1,7 @@
 from math import log, floor
 
 symbols: dict[int, str] = {
+		-4: 'a',
 		-3: 'n',
 		-2: 'μ',
 		-1: 'm',

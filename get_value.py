@@ -1,6 +1,8 @@
 from typing import Callable
 
-operator_dict: dict[str, Callable[[float, float], float]] = {
+from numpy import double
+
+operator_dict: dict[str, Callable[[double, double], double]] = {
 	'*': lambda x, y: x*y,
 	'/': lambda x, y: x/y,
 	'e': lambda x, y: x * 10 ** y,
@@ -12,16 +14,17 @@ operator_dict: dict[str, Callable[[float, float], float]] = {
 infix_operators = ['*', '/', 'e', '-', '+']
 
 
-def getExprValue(expr: str, stored: dict[str, float]) -> float:
+def getExprValue(expr: str, stored: dict[str, double]) -> double:
+	expr = expr.strip()
 	if expr == '':
-		return 1
+		return double(1)
 
 	if expr[0] == '-':
 		abs_expr = expr[1:]
-		sign = -1
+		sign = double(-1)
 	else:
 		abs_expr = expr
-		sign = 1
+		sign = double(1)
 
 	if abs_expr == '':
 		return sign
@@ -32,11 +35,11 @@ def getExprValue(expr: str, stored: dict[str, float]) -> float:
 	# prepend = '1' if abs_expr[0] == 'e' else ''
 	# pr_expr = (prepend + abs_expr).strip()
 
-	value: float
+	value: double
 	for operator in infix_operators:
 		if operator in abs_expr:
 			oper_split = abs_expr.split(operator)
-			first_segment = ''.join(oper_split[:-1])
+			first_segment = operator.join(oper_split[:-1])
 			first_val = getExprValue(first_segment, stored)
 			second_segment = oper_split[-1]
 			second_val = getExprValue(second_segment, stored)
@@ -44,7 +47,7 @@ def getExprValue(expr: str, stored: dict[str, float]) -> float:
 			break
 
 	else:
-		value = float(abs_expr)
+		value = double(abs_expr)
 
 	return sign * value
 
